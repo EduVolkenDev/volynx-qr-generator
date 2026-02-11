@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de QR Code Simples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #00d4ff, #090979);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            font-size: 1em;
+            margin-bottom: 20px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder {
+            color: #aaa;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #00d4ff, #090979);
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        #qr {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-group label {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .option-group select,
+        .option-group input {
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .option-group input[type="color"] {
+            width: 50px;
+            height: 35px;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+        }
+
+        #qr-container {
+            margin: 20px 0;
+        }
+
+        #downloadBtn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #downloadBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 QR Generator</h1>
+        <input type="text" id="text" placeholder="Digite o texto ou URL para gerar QR" />
+
+        <div class="options">
+            <div class="option-group">
+                <label>Tamanho:</label>
+                <select id="size">
+                    <option value="200">Pequeno</option>
+                    <option value="300" selected>Médio</option>
+                    <option value="400">Grande</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <label>Estilo:</label>
+                <select id="dotsType">
+                    <option value="square">Quadrado</option>
+                    <option value="dots">Bolotas</option>
+                    <option value="rounded">Arredondado</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <label>Cor QR:</label>
+                <input type="color" id="dotsColor" value="#000000" />
+            </div>
+            <div class="option-group">
+                <label>Fundo:</label>
+                <input type="color" id="backgroundColor" value="#ffffff" />
+            </div>
+            <div class="option-group">
+                <label>Logo (opcional):</label>
+                <input type="file" id="logo" accept="image/*" />
+            </div>
+        </div>
+
+        <button onclick="generateQR()">Gerar QR Code</button>
+        <div id="qr-container"></div>
+        <button id="downloadBtn" onclick="downloadQR()" style="display:none;">📥 Baixar QR Code</button>
+        <div class="footer">Tecnologia futurista para geração instantânea</div>
+    </div>
+
+    <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+    <script>
+        let qrCode;
+
+        async function generateQR() {
+            const text = document.getElementById('text').value;
+            if (!text) return alert('Digite algo para gerar o QR!');
+
+            const size = parseInt(document.getElementById('size').value);
+            const dotsType = document.getElementById('dotsType').value;
+            const dotsColor = document.getElementById('dotsColor').value;
+            const backgroundColor = document.getElementById('backgroundColor').value;
+            const logoFile = document.getElementById('logo').files[0];
+
+            let logoImage = null;
+            if (logoFile) {
+                logoImage = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(logoFile);
+                });
+            }
+
+            const options = {
+                width: size,
+                height: size,
+                type: "svg",
+                data: text,
+                dotsOptions: {
+                    color: dotsColor,
+                    type: dotsType
+                },
+                backgroundOptions: {
+                    color: backgroundColor,
+                },
+                cornersSquareOptions: {
+                    color: dotsColor,
+                    type: dotsType === 'rounded' ? 'extra-rounded' : 'square'
+                },
+                cornersDotOptions: {
+                    color: dotsColor,
+                    type: dotsType === 'rounded' ? 'dot' : 'square'
+                },
+                qrOptions: {
+                    errorCorrectionLevel: 'M'
+                }
+            };
+
+            if (logoImage) {
+                options.image = logoImage;
+                options.imageOptions = {
+                    crossOrigin: "anonymous",
+                    margin: 10
+                };
+            }
+
+            if (qrCode) {
+                qrCode.update(options);
+            } else {
+                qrCode = new QRCodeStyling(options);
+                qrCode.append(document.getElementById('qr-container'));
+            }
+
+            document.getElementById('downloadBtn').style.display = 'inline-block';
+        }
+
+        function downloadQR() {
+            if (qrCode) {
+                qrCode.download({ extension: "png" });
+            }
+        }
+    </script>
+</body>
+
+</html>
