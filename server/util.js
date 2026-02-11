@@ -38,6 +38,10 @@ export function computeValidity(inst, me = null) {
     const e = new Date(inst.ends_at);
     if (now > e) return { valid: false, reason: "expired" };
   }
+  if (inst.expiry_date) {
+    const e = new Date(inst.expiry_date);
+    if (now > e) return { valid: false, reason: "expired" };
+  }
 
   // Limites globais / por usuário (se configurados)
   if (Number(inst.max_redemptions_total || 0) > 0) {

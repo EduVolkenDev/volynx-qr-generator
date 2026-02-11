@@ -8,25 +8,26 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   const { org_name, email, password } = req.body || {};
   if (!org_name || !email || !password)
-    return res
-      .status(400)
-      .json({
-        ok: false,
-        message: "org_name, email, password são obrigatórios",
-      });
+    return res.status(400).json({
+      ok: false,
+      message: "org_name, email, password são obrigatórios",
+    });
 
   const usersCount = db.prepare("SELECT COUNT(*) as c FROM users").get().c;
   if (usersCount > 0)
-    return res
-      .status(409)
-      .json({
-        ok: false,
-        message: "Setup já foi executado (já existe usuário)",
-      });
+    return res.status(409).json({
+      ok: false,
+      message: "Setup já foi executado (já existe usuário)",
+    });
+
+  const subscription_expiry = new Date();
+  subscription_expiry.setDate(subscription_expiry.getDate() + 30); // 30 dias trial
 
   const org = db
-    .prepare("INSERT INTO organizations (name, created_at) VALUES (?, ?)")
-    .run(org_name, nowIso());
+    .prepare(
+      "INSERT INTO organizations (name, subscription_expiry, created_at) VALUES (?, ?, ?)",
+    )
+    .run(org_name, subscription_expiry.toISOString(), nowIso());
   const org_id = org.lastInsertRowid;
 
   // lazy import para reduzir superfície

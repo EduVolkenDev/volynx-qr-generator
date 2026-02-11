@@ -1,5 +1,9 @@
 import express from "express";
-import { authRequired, roleRequired } from "../security.js";
+import {
+  authRequired,
+  roleRequired,
+  subscriptionRequired,
+} from "../security.js";
 import { db } from "../db.js";
 import {
   computeValidity,
@@ -11,6 +15,7 @@ import {
 const router = express.Router();
 
 router.use(authRequired);
+router.use(subscriptionRequired);
 router.use(roleRequired(["admin", "operator"]));
 
 router.post("/validate", (req, res) => {
@@ -22,7 +27,7 @@ router.post("/validate", (req, res) => {
   const inst = db
     .prepare(
       `
-    SELECT vi.token, vi.status as instance_status, vi.redeemed_at,
+    SELECT vi.token, vi.status as instance_status, vi.redeemed_at, vi.expiry_date,
            v.id as voucher_id, v.name, v.type, v.value, v.status as voucher_status, v.starts_at, v.ends_at,
            v.max_redemptions_total, v.max_redemptions_per_user
     FROM voucher_instances vi
@@ -61,7 +66,7 @@ router.post("/redeem", (req, res) => {
   const inst = db
     .prepare(
       `
-    SELECT vi.id as instance_id, vi.token, vi.status as instance_status, vi.redeemed_at,
+    SELECT vi.id as instance_id, vi.token, vi.status as instance_status, vi.redeemed_at, vi.expiry_date,
            v.id as voucher_id, v.name, v.type, v.value, v.status as voucher_status, v.starts_at, v.ends_at,
            v.max_redemptions_total, v.max_redemptions_per_user
     FROM voucher_instances vi

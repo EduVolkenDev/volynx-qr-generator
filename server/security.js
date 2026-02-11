@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { db } from "./db.js";
 
 dotenv.config();
 
@@ -10,7 +11,7 @@ export function issueSession(res, user) {
   const token = jwt.sign(
     { id: user.id, org_id: user.org_id, role: user.role, email: user.email },
     JWT_SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: "7d" },
   );
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
@@ -50,8 +51,35 @@ export function roleRequired(roleOrRoles) {
   const roles = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
   return (req, res, next) => {
     const me = req.user || getUserFromReq(req);
-    if (!me) return res.status(401).json({ ok: false, message: "unauthorized" });
-    if (!roles.includes(me.role)) return res.status(403).json({ ok: false, message: "forbidden" });
+    if (!me)
+      return res.status(401).json({ ok: false, message: "unauthorized" });
+    if (!roles.includes(me.role))
+      return res.status(403).json({ ok: false, message: "forbidden" });
     next();
   };
+}
+
+export function subscriptionRequired(req, res, next) {
+  const me = req.user || getUserFromReq(req);
+  if (!me) return res.status(401).json({ ok: false, message: "unauthorized" });
+
+  const org = db
+    .prepare("SELECT subscription_expiry FROM organizations WHERE id = ?")
+    .get(me.org_id);
+  if (!org)
+    return res
+      .status(403)
+      .json({ ok: false, message: "organization_not_found" });
+
+  if (org.subscription_expiry) {
+    const now = new Date();
+    const expiry = new Date(org.subscription_expiry);
+    if (now > expiry) {
+      return res
+        .status(403)
+        .json({ ok: false, message: "subscription_expired" });
+    }
+  }
+
+  next();
 }

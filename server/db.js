@@ -18,6 +18,7 @@ export function initDb() {
     CREATE TABLE IF NOT EXISTS organizations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
+      subscription_expiry TEXT NULL,
       created_at TEXT NOT NULL
     );
 
@@ -55,6 +56,7 @@ export function initDb() {
       redeemed_at TEXT NULL,
       redeemed_by_user_id INTEGER NULL,
       signature_path TEXT NULL,
+      expiry_date TEXT NULL,
       created_at TEXT NOT NULL,
       FOREIGN KEY(org_id) REFERENCES organizations(id),
       FOREIGN KEY(voucher_id) REFERENCES vouchers(id),
@@ -82,6 +84,24 @@ export function initDb() {
       FOREIGN KEY(user_id) REFERENCES users(id)
     );
   `);
+
+  // Migração: adicionar expiry_date se não existir
+  const columns = db.prepare("PRAGMA table_info(voucher_instances)").all();
+  const hasExpiry = columns.some((col) => col.name === "expiry_date");
+  if (!hasExpiry) {
+    db.exec(`ALTER TABLE voucher_instances ADD COLUMN expiry_date TEXT NULL`);
+  }
+
+  // Migração: adicionar subscription_expiry se não existir
+  const orgColumns = db.prepare("PRAGMA table_info(organizations)").all();
+  const hasSubExpiry = orgColumns.some(
+    (col) => col.name === "subscription_expiry",
+  );
+  if (!hasSubExpiry) {
+    db.exec(
+      `ALTER TABLE organizations ADD COLUMN subscription_expiry TEXT NULL`,
+    );
+  }
 
   // cria um operador demo se quiser (opcional) — deixado vazio por segurança
 }

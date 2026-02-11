@@ -15,7 +15,7 @@ router.get("/status/:token", (req, res) => {
   const inst = db
     .prepare(
       `
-    SELECT vi.token, vi.status as instance_status, vi.redeemed_at, v.name, v.type, v.value, v.status as voucher_status, v.starts_at, v.ends_at
+    SELECT vi.token, vi.status as instance_status, vi.redeemed_at, vi.expiry_date, v.name, v.type, v.value, v.status as voucher_status, v.starts_at, v.ends_at
     FROM voucher_instances vi
     JOIN vouchers v ON v.id = vi.voucher_id
     WHERE vi.token = ?
