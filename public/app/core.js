@@ -276,6 +276,11 @@ export const Core = (() => {
         </table>
       </div>
     `;
+
+    // bind actions dentro do voucherDetail (HTML foi inserido depois do render principal)
+    host.querySelectorAll("[data-action]").forEach(el => {
+      el.addEventListener("click", () => handle(el.getAttribute("data-action"), el.dataset));
+    });
   }
 
   function viewOperator() {
