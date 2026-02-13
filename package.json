@@ -6,7 +6,8 @@
   "description": "Mobile-first PWA + API for dynamic QR, unique vouchers, restricted validation, signatures.",
   "scripts": {
     "dev": "node server/server.js",
-    "start": "NODE_ENV=production node server/server.js"
+    "start": "NODE_ENV=production node server/server.js",
+    "build": "npm rebuild better-sqlite3"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
