@@ -1,0 +1,16 @@
+node_modules/
+
+# Ambiente - NUNCA commitar
+.env
+
+# Banco de dados SQLite e assinaturas (dados de produção)
+data/
+
+# Vercel
+.vercel
+
+# macOS
+.DS_Store
+
+# Logs
+*.log

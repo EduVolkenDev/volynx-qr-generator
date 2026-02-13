@@ -120,9 +120,12 @@ export const Core = (() => {
     return tpl("login", `
       <div class="container">
         <div class="card">
-          <div class="h2">Login</div>
-          <p class="small">Vouchers únicos e validação restrita. Sem sessão, sem resgate.</p>
-          ${state.pendingToken ? `<div class="badge warn">Token capturado do QR: <b>${state.pendingToken.slice(0,8)}…</b></div>` : ""}
+          <div class="h2">Fazer login</div>
+          ${state.pendingToken ? `
+            <div class="badge warn" style="margin-bottom:12px">
+              📲 Você escaneou um código VOLYNX. Faça login ou crie sua conta para ativar o acesso.
+            </div>
+          ` : `<p class="small">Acesse sua conta VOLYNX para gerenciar e validar seus códigos.</p>`}
           <div class="hr"></div>
           <div class="grid">
             <div class="field">
@@ -133,8 +136,10 @@ export const Core = (() => {
               <label>Senha</label>
               <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
             </div>
-            <button class="btn primary" data-action="login">Entrar</button>
-            <button class="btn" data-nav="/setup">Primeiro acesso (Setup)</button>
+            <button class="btn primary" data-action="login">Fazer login</button>
+            <div class="hr"></div>
+            <p class="small" style="text-align:center;margin:0">Não tem uma conta VOLYNX?</p>
+            <button class="btn" data-nav="/setup">Cadastre-se aqui</button>
           </div>
         </div>
       </div>
@@ -145,8 +150,8 @@ export const Core = (() => {
     return tpl("setup", `
       <div class="container">
         <div class="card">
-          <div class="h2">Setup (primeiro admin)</div>
-          <p class="small">Executa uma única vez. Se já existir usuário, o backend bloqueia.</p>
+          <div class="h2">Criar conta VOLYNX</div>
+          <p class="small">Crie sua conta para começar a usar seus códigos e gerenciar seus acessos.</p>
           <div class="hr"></div>
           <div class="grid">
             <div class="field">
@@ -154,15 +159,17 @@ export const Core = (() => {
               <input id="org_name" placeholder="Minha Empresa" />
             </div>
             <div class="field">
-              <label>Email admin</label>
-              <input id="email" placeholder="admin@empresa.com" autocomplete="username" />
+              <label>Email</label>
+              <input id="email" placeholder="voce@email.com" autocomplete="username" />
             </div>
             <div class="field">
               <label>Senha</label>
               <input id="password" type="password" placeholder="Crie uma senha forte" autocomplete="new-password" />
             </div>
-            <button class="btn primary" data-action="setup">Criar admin</button>
-            <button class="btn" data-nav="/login">Voltar</button>
+            <button class="btn primary" data-action="setup">Criar conta</button>
+            <div class="hr"></div>
+            <p class="small" style="text-align:center;margin:0">Já tem uma conta?</p>
+            <button class="btn" data-nav="/login">Fazer login</button>
           </div>
         </div>
       </div>
@@ -288,17 +295,17 @@ export const Core = (() => {
       <div class="container">
         <div class="grid cols2">
           <div class="card">
-            <div class="h2">Validar / Resgatar</div>
-            <div class="small">Cole o token ou escaneie com o app (o QR abre /q/:token; aqui você valida com sessão).</div>
+            <div class="h2">Validar / Resgatar código</div>
+            <div class="small">Escaneie o QR code ou cole o token abaixo para validar e resgatar o acesso.</div>
             <div class="hr"></div>
             <div class="grid">
               <div class="field">
-                <label>Token</label>
-                <input id="op_token" placeholder="Cole aqui (ou abra /q/:token e faça login)" />
+                <label>Token do código</label>
+                <input id="op_token" placeholder="Cole o token aqui" />
               </div>
               <div class="row">
-                <button class="btn primary" data-action="validateToken">Validar</button>
-                <button class="btn" data-action="usePendingToken">Usar token capturado</button>
+                <button class="btn primary" data-action="validateToken">Validar código</button>
+                ${`<button class="btn" data-action="usePendingToken">Usar código escaneado</button>`}
               </div>
               <div id="op_result"></div>
             </div>

@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: volynx-qr-generator
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: APP_BASE_URL
+        fromService:
+          type: web
+          name: volynx-qr-generator
+          property: host
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SESSION_COOKIE_NAME
+        value: volynx_session
+      - key: DATA_DIR
+        value: /data
+    disk:
+      name: volynx-data
+      mountPath: /data
+      sizeGB: 1
